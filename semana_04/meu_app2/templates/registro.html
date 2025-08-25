@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Registro de Usuário{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h3 class="text-center mb-3">Crie sua conta</h3>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.nome.label(class="form-label fw-semibold") }}
+          {{ form.nome(class="form-control") }}
+          {% for e in form.nome.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label fw-semibold") }}
+          {{ form.email(class="form-control") }}
+          {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.senha.label(class="form-label fw-semibold") }}
+          {{ form.senha(class="form-control") }}
+          {% for e in form.senha.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.confirmar_senha.label(class="form-label fw-semibold") }}
+          {{ form.confirmar_senha(class="form-control") }}
+          {% for e in form.confirmar_senha.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.biografia.label(class="form-label fw-semibold") }}
+          {{ form.biografia(class="form-control", rows=3) }}
+        </div>
+
+        <div class="form-check mb-3">
+          {{ form.aceitar_termos(class="form-check-input") }}
+          {{ form.aceitar_termos.label(class="form-check-label") }}
+          {% for e in form.aceitar_termos.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+
+        <div class="d-grid">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
