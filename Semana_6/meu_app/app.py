@@ -1,16 +1,17 @@
-from flask import Flask
+# app.py
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
 
-# Configuração do banco de dados (igual ao repo que você mandou usa SQLite)
+# Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///meu_banco.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Modelo User (já existia no desafio anterior)
+# Modelo User
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -19,7 +20,7 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.username}>"
 
-# 🚀 Novo Modelo Post (Desafio Semanal 5)
+# Modelo Post
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(120), nullable=False)
@@ -29,5 +30,16 @@ class Post(db.Model):
     def __repr__(self):
         return f"<Post {self.titulo}>"
 
+# Rota principal
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+# Para facilitar o uso no flask shell
+@app.shell_context_processor
+def make_shell_context():
+    return {'db': db, 'User': User, 'Post': Post}
+
+# Rodar o app
 if __name__ == "__main__":
     app.run(debug=True)
