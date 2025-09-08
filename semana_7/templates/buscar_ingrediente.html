@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Receitas com {{ ingrediente.nome }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">Receitas com <span class="text-primary">{{ ingrediente.nome }}</span></h2>
+
+<ul class="list-group">
+    {% for receita in ingrediente.receitas %}
+    <li class="list-group-item">{{ receita.titulo }}</li>
+    {% else %}
+    <li class="list-group-item text-muted">Nenhuma receita usa esse ingrediente.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

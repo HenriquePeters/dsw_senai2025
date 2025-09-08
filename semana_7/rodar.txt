@@ -1,0 +1,5 @@
+1 - cd semana_7
+
+2 - python populate.py
+
+3 - flask --app app run --debug

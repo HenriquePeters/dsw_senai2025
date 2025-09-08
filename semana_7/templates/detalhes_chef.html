@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Detalhes do Chef{% endblock %}
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h2>{{ chef.nome }}</h2>
+    <p><b>Especialidade:</b> {{ chef.perfil.especialidade }}</p>
+    <p><b>Anos de experiência:</b> {{ chef.perfil.anos_experiencia }}</p>
+</div>
+
+<h3 class="mt-4">Receitas Criadas</h3>
+<ul class="list-group">
+    {% for receita in chef.receitas %}
+    <li class="list-group-item">{{ receita.titulo }}</li>
+    {% else %}
+    <li class="list-group-item text-muted">Nenhuma receita cadastrada ainda.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

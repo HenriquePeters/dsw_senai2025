@@ -1,0 +1,12 @@
+<div class="card-body">
+    <h5 class="card-title">{{ receita.titulo }}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">
+        Chef: <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}">{{ receita.chef.nome }}</a>
+    </h6>
+    <p><b>Ingredientes:</b> {{ receita.ingredientes | map(attribute='nome') | join(', ') }}</p>
+
+    <form method="post" action="{{ url_for('remover_receita', receita_id=receita.id) }}" 
+          onsubmit="return confirm('Tem certeza que deseja remover esta receita?');">
+        <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+    </form>
+</div>
