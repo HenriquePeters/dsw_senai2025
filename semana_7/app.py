@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from models import db, Chef, PerfilChef, Receita, Ingrediente
 
+
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///receitas.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
