@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Criar Chef{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Criar Novo Chef</h1>
+    <form method="POST" action="{{ url_for('criar_chef') }}">
+        <div class="mb-3">
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" class="form-control" id="nome" name="nome" required>
+        </div>
+        <div class="mb-3">
+            <label for="especialidade" class="form-label">Especialidade</label>
+            <input type="text" class="form-control" id="especialidade" name="especialidade" required>
+        </div>
+        <div class="mb-3">
+            <label for="anos_experiencia" class="form-label">Anos de Experiência</label>
+            <input type="number" class="form-control" id="anos_experiencia" name="anos_experiencia" required>
+        </div>
+        <button type="submit" class="btn btn-success">Cadastrar Chef</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+    </form>
+{% endblock %}

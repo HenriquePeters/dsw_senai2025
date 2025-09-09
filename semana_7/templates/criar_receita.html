@@ -1,33 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Nova Receita{% endblock %}
+
+{% block title %}Criar Receita{% endblock %}
+
 {% block content %}
-<h2 class="mb-4">Adicionar Nova Receita</h2>
-
-<form method="post" class="card p-4 shadow-sm">
-    <div class="mb-3">
-        <label class="form-label">Título</label>
-        <input type="text" name="titulo" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Instruções</label>
-        <textarea name="instrucoes" class="form-control" rows="4" required></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Chef</label>
-        <select name="chef" class="form-select">
-            {% for chef in chefs %}
-            <option value="{{ chef.id }}">{{ chef.nome }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Ingredientes (separados por vírgula)</label>
-        <input type="text" name="ingredientes" class="form-control" placeholder="Ex: Farinha, Ovos, Açúcar" required>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Salvar Receita</button>
-</form>
+    <h1 class="mb-4">Criar Nova Receita</h1>
+    <form method="POST" action="{{ url_for('criar_receita') }}">
+        <div class="mb-3">
+            <label for="titulo" class="form-label">Título</label>
+            <input type="text" class="form-control" id="titulo" name="titulo" required>
+        </div>
+        <div class="mb-3">
+            <label for="instrucoes" class="form-label">Instruções</label>
+            <textarea class="form-control" id="instrucoes" name="instrucoes" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="chef" class="form-label">Chef</label>
+            <select class="form-select" id="chef" name="chef" required>
+                <option value="">Selecione um chef</option>
+                {% for chef in chefs %}
+                    <option value="{{ chef.id }}">{{ chef.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="ingredientes" class="form-label">Ingredientes (separados por vírgula)</label>
+            <input type="text" class="form-control" id="ingredientes" name="ingredientes" placeholder="Ex: Farinha, Ovos, Açúcar" required>
+        </div>
+        <button type="submit" class="btn btn-success">Cadastrar Receita</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+    </form>
 {% endblock %}

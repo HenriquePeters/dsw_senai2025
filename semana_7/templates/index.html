@@ -1,24 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Receitas Deliciosas{% endblock %}
+
+{% block title %}Lista de Receitas{% endblock %}
+
 {% block content %}
-<h2 class="mb-4">Receitas Disponíveis</h2>
-
-<div class="row">
-    {% for receita in receitas %}
-    <div class="col-md-6 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">{{ receita.titulo }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                    Chef: <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}">{{ receita.chef.nome }}</a>
-                </h6>
-                <p><b>Ingredientes:</b> {{ receita.ingredientes | map(attribute='nome') | join(', ') }}</p>
-
-            </div>
+    <h1 class="mb-4">Receitas</h1>
+    {% if receitas %}
+        <div class="row">
+            {% for receita in receitas %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ receita.titulo }}</h5>
+                            <p class="card-text">
+                                <strong>Chef:</strong> {{ receita.chef.nome if receita.chef else 'Sem Chef' }}<br>
+                                <strong>Instruções:</strong> {{ receita.instrucoes|truncate(100) }}
+                            </p>
+                            <form action="{{ url_for('deletar_receita', receita_id=receita.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja deletar a receita {{ receita.titulo }}?')">Remover</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    </div>
     {% else %}
-    <p class="text-muted">Nenhuma receita cadastrada ainda.</p>
-    {% endfor %}
-</div>
+        <p class="text-muted">Nenhuma receita cadastrada.</p>
+    {% endif %}
 {% endblock %}

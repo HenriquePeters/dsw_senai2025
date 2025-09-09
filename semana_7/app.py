@@ -40,6 +40,32 @@ def criar_receita():
 
     return render_template("criar_receita.html", chefs=chefs)
 
+@app.route("/chef/novo", methods=["GET", "POST"])
+def criar_chef():
+    if request.method == "POST":
+        nome = request.form["nome"]
+        especialidade = request.form["especialidade"]
+        anos_experiencia = request.form["anos_experiencia"]
+
+        chef = Chef(nome=nome)
+        db.session.add(chef)
+        db.session.commit()
+
+        perfil = PerfilChef(especialidade=especialidade, anos_experiencia=anos_experiencia, chef=chef)
+        db.session.add(perfil)
+        db.session.commit()
+
+        return redirect(url_for("index"))
+
+    return render_template("criar_chef.html")
+
+@app.route("/receita/deletar/<int:receita_id>", methods=["POST"])
+def deletar_receita(receita_id):
+    receita = Receita.query.get_or_404(receita_id)
+    db.session.delete(receita)
+    db.session.commit()
+    return redirect(url_for("index"))
+
 @app.route("/chef/<int:chef_id>")
 def detalhes_chef(chef_id):
     chef = Chef.query.get_or_404(chef_id)
