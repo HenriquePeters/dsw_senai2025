@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from models import db, Chef, PerfilChef, Receita, Ingrediente
 
-
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///receitas.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -53,10 +52,3 @@ def buscar_por_ingrediente(nome_ingrediente):
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-@app.route("/receita/remover/<int:receita_id>", methods=["POST"])
-def remover_receita(receita_id):
-    receita = Receita.query.get_or_404(receita_id)
-    db.session.delete(receita)
-    db.session.commit()
-    return redirect(url_for("index"))

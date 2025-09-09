@@ -1,32 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Lista de Receitas{% endblock %}
-
+{% block title %}Receitas Deliciosas{% endblock %}
 {% block content %}
-<h1 class="mb-4">Receitas</h1>
+<h2 class="mb-4">Receitas Disponíveis</h2>
 
 <div class="row">
     {% for receita in receitas %}
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm h-100">
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">{{ receita.titulo }}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">
-                    Chef:
-                    <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}">
-                        {{ receita.chef.nome }}
-                    </a>
+                    Chef: <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}">{{ receita.chef.nome }}</a>
                 </h6>
+                <p><b>Ingredientes:</b> {{ receita.ingredientes | map(attribute='nome') | join(', ') }}</p>
 
-                <p>
-                    <b>Ingredientes:</b>
-                    {{ receita.ingredientes | map(attribute='nome') | join(', ') }}
-                </p>
-
-                <form method="post"
-                      action="{{ url_for('remover_receita', receita_id=receita.id) }}"
-                      onsubmit="return confirm('Tem certeza que deseja remover esta receita?');">
-                    <button type="submit" class="btn btn-danger btn-sm">Remover</button>
-                </form>
             </div>
         </div>
     </div>
