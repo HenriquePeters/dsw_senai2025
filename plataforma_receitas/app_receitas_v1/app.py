@@ -3,24 +3,22 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Define o caminho base do projeto
+# Caminho base
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Cria a instância da aplicação Flask
 app = Flask(__name__)
 
-# Configurações da aplicação
+# Configurações
 app.config['SQLALCHEMY_DATABASE_URI'] = \
     'sqlite:///' + os.path.join(basedir, 'instance', 'receitas.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'minha_chave_secreta'  # troque depois para algo seguro
+app.config['SECRET_KEY'] = 'minha_chave_secreta'
 
-# Cria a pasta 'instance' se ela não existir
+# Garante pasta instance
 instance_path = os.path.join(basedir, 'instance')
 if not os.path.exists(instance_path):
     os.makedirs(instance_path)
 
-# Inicializa a extensão SQLAlchemy
 db = SQLAlchemy(app)
 
 # ----------------- MODELOS -----------------
@@ -116,7 +114,6 @@ def init_db_command():
         'ovo': Ingrediente(nome='ovo'),
         'manteiga': Ingrediente(nome='manteiga')
     }
-
     db.session.add_all(ingredientes.values())
 
     # Criando Receitas
@@ -190,3 +187,139 @@ def login_required(func):
         return func(*args, **kwargs)
     wrapper.__name__ = func.__name__
     return wrapper
+
+# ----------------- ROTAS RECEITAS -----------------
+@app.route('/')
+@login_required
+def index():
+    receitas = Receita.query.all()
+    return render_template('index.html', receitas=receitas)
+
+@app.route('/receita/nova', methods=['GET', 'POST'])
+@login_required
+def criar_receita():
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        instrucoes = request.form['instrucoes']
+        chef_id = request.form['chef_id']
+
+        nova_receita = Receita(titulo=titulo, instrucoes=instrucoes, chef_id=chef_id)
+        db.session.add(nova_receita)
+
+        ingredientes_str = request.form['ingredientes']
+        pares_ingredientes = [par.strip() for par in ingredientes_str.split(',') if par.strip()]
+
+        for par in pares_ingredientes:
+            if ':' in par:
+                nome, qtd = par.split(':', 1)
+                nome_ingrediente = nome.strip().lower()
+                quantidade = qtd.strip()
+
+                ingrediente = Ingrediente.query.filter_by(nome=nome_ingrediente).first()
+                if not ingrediente:
+                    ingrediente = Ingrediente(nome=nome_ingrediente)
+                    db.session.add(ingrediente)
+
+                associacao = ReceitaIngrediente(
+                    receita=nova_receita,
+                    ingrediente=ingrediente,
+                    quantidade=quantidade
+                )
+                db.session.add(associacao)
+
+        db.session.commit()
+        flash("Receita criada com sucesso!", "success")
+        return redirect(url_for('index'))
+
+    chefs = Chef.query.all()
+    return render_template('criar_receita.html', chefs=chefs)
+
+@app.route('/receita/editar/<int:receita_id>', methods=['GET', 'POST'])
+@login_required
+def editar_receita(receita_id):
+    receita = Receita.query.get_or_404(receita_id)
+    if request.method == 'POST':
+        receita.titulo = request.form['titulo']
+        receita.instrucoes = request.form['instrucoes']
+        db.session.commit()
+        flash("Receita atualizada com sucesso!", "success")
+        return redirect(url_for('index'))
+    return render_template('editar_receita.html', receita=receita)
+
+@app.route('/receita/excluir/<int:receita_id>', methods=['POST'])
+@login_required
+def excluir_receita(receita_id):
+    receita = Receita.query.get_or_404(receita_id)
+    db.session.delete(receita)
+    db.session.commit()
+    flash("Receita excluída com sucesso!", "danger")
+    return redirect(url_for('index'))
+
+# ----------------- ROTAS CHEFS -----------------
+@app.route('/chefs')
+@login_required
+def listar_chefs():
+    chefs = Chef.query.all()
+    return render_template('chefs.html', chefs=chefs)
+
+@app.route('/chef/novo', methods=['GET', 'POST'])
+@login_required
+def criar_chef():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        especialidade = request.form['especialidade']
+        anos_experiencia = request.form['anos_experiencia']
+
+        novo_chef = Chef(nome=nome)
+        db.session.add(novo_chef)
+        db.session.commit()
+
+        perfil = PerfilChef(
+            especialidade=especialidade,
+            anos_experiencia=anos_experiencia,
+            chef=novo_chef
+        )
+        db.session.add(perfil)
+        db.session.commit()
+
+        flash("Chef cadastrado com sucesso!", "success")
+        return redirect(url_for('listar_chefs'))
+
+    return render_template('criar_chef.html')
+
+@app.route('/chef/editar/<int:chef_id>', methods=['GET', 'POST'])
+@login_required
+def editar_chef(chef_id):
+    chef = Chef.query.get_or_404(chef_id)
+    if request.method == 'POST':
+        chef.nome = request.form['nome']
+        chef.perfil.especialidade = request.form['especialidade']
+        chef.perfil.anos_experiencia = request.form['anos_experiencia']
+        db.session.commit()
+        flash("Chef atualizado com sucesso!", "success")
+        return redirect(url_for('listar_chefs'))
+    return render_template('editar_chef.html', chef=chef)
+
+@app.route('/chef/excluir/<int:chef_id>', methods=['POST'])
+@login_required
+def excluir_chef(chef_id):
+    chef = Chef.query.get_or_404(chef_id)
+    db.session.delete(chef)
+    db.session.commit()
+    flash("Chef excluído com sucesso!", "danger")
+    return redirect(url_for('listar_chefs'))
+
+@app.route('/chef/<int:chef_id>')
+@login_required
+def detalhes_chef(chef_id):
+    chef = Chef.query.get_or_404(chef_id)
+    return render_template('detalhes_chef.html', chef=chef)
+
+# ----------------- ERROS -----------------
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
+
+# ----------------- MAIN -----------------
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
