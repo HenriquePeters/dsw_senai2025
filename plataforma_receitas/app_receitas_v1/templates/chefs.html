@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Chefs{% endblock %}
+{% block content %}
+<h1 class="mb-4">Lista de Chefs</h1>
+
+<div class="row">
+    {% for chef in chefs %}
+        <div class="col-md-4 mb-4">
+            <div class="card p-3 h-100">
+                <h5 class="card-title">{{ chef.nome }}</h5>
+                {% if chef.perfil %}
+                    <p class="card-text"><strong>Especialidade:</strong> {{ chef.perfil.especialidade }}</p>
+                    <p class="card-text"><strong>Experiência:</strong> {{ chef.perfil.anos_experiencia }} anos</p>
+                {% endif %}
+                <a href="{{ url_for('detalhes_chef', chef_id=chef.id) }}" class="btn btn-sm btn-outline-dark">
+                    Ver Detalhes
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <p>Nenhum chef cadastrado ainda.</p>
+    {% endfor %}
+</div>
+{% endblock %}

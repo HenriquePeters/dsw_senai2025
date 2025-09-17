@@ -71,8 +71,8 @@ class ReceitaIngrediente(db.Model):
 
     receita = db.relationship("Receita", back_populates="ingredientes")
     ingrediente = db.relationship("Ingrediente", back_populates="receitas")
-
-# ----------------- CLI -----------------
+    
+    # ----------------- CLI -----------------
 @app.cli.command('init-db')
 def init_db_command():
     """Cria as tabelas e popula com dados de exemplo."""
@@ -84,36 +84,23 @@ def init_db_command():
     chef2 = Chef(nome='Érick Jacquin')
     perfil2 = PerfilChef(especialidade='Culinária Francesa', anos_experiencia=30, chef=chef2)
 
-    ingredientes = {
-        'tomate': Ingrediente(nome='tomate'), 'cebola': Ingrediente(nome='cebola'),
-        'farinha': Ingrediente(nome='farinha'), 'ovo': Ingrediente(nome='ovo'),
-        'manteiga': Ingrediente(nome='manteiga')
-    }
-
-    db.session.add_all([chef1, chef2] + list(ingredientes.values()))
+    db.session.add_all([chef1, chef2, perfil1, perfil2])
 
     receita1 = Receita(titulo='Molho de Tomate Clássico', instrucoes='...', chef=chef1)
     receita2 = Receita(titulo='Bolo Simples', instrucoes='...', chef=chef1)
     receita3 = Receita(titulo='Petit Gâteau', instrucoes='...', chef=chef2)
+
     db.session.add_all([receita1, receita2, receita3])
-
-    db.session.add_all([
-        ReceitaIngrediente(receita=receita1, ingrediente=ingredientes['tomate'], quantidade='5 unidades'),
-        ReceitaIngrediente(receita=receita1, ingrediente=ingredientes['cebola'], quantidade='1 unidade'),
-        ReceitaIngrediente(receita=receita2, ingrediente=ingredientes['farinha'], quantidade='2 xícaras'),
-        ReceitaIngrediente(receita=receita2, ingrediente=ingredientes['ovo'], quantidade='3 unidades'),
-        ReceitaIngrediente(receita=receita3, ingrediente=ingredientes['manteiga'], quantidade='150g')
-    ])
-
     db.session.commit()
+
     print('Banco de dados inicializado com sucesso!')
+
 
 # ----------------- ROTAS -----------------
 @app.route('/')
 def index():
     receitas = Receita.query.all()
     return render_template('index.html', receitas=receitas)
-
 
 @app.route('/receita/nova', methods=['GET', 'POST'])
 def criar_receita():
@@ -152,11 +139,44 @@ def criar_receita():
     chefs = Chef.query.all()
     return render_template('criar_receita.html', chefs=chefs)
 
+@app.route('/chef/novo', methods=['GET', 'POST'])
+def criar_chef():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        especialidade = request.form['especialidade']
+        anos_experiencia = request.form['anos_experiencia']
+
+        novo_chef = Chef(nome=nome)
+        db.session.add(novo_chef)
+        db.session.commit()
+
+        perfil = PerfilChef(
+            especialidade=especialidade,
+            anos_experiencia=anos_experiencia,
+            chef=novo_chef
+        )
+        db.session.add(perfil)
+        db.session.commit()
+
+        return redirect(url_for('index'))
+
+    return render_template('criar_chef.html')
 
 @app.route('/chef/<int:chef_id>')
 def detalhes_chef(chef_id):
     chef = Chef.query.get_or_404(chef_id)
     return render_template('detalhes_chef.html', chef=chef)
+
+@app.route('/chefs')
+def listar_chefs():
+    chefs = Chef.query.all()
+    return render_template('chefs.html', chefs=chefs)
+
+
+# ----------------- ERROS -----------------
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 # ----------------- MAIN -----------------
 if __name__ == '__main__':

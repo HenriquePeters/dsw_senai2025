@@ -1,31 +1,21 @@
-{% extends 'base.html' %}
-{% block content %}
-    <h1>Todas as Receitas</h1>
-    <div class="card-grid">
-        {% for receita in receitas %}
-            <div class="card">
-                <h2>{{ receita.titulo }}</h2>
-                <p>Por: <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}">{{ receita.chef.nome }}</a></p>
-                <h4>Ingredientes:</h4>
-                <ul>
-                    {% for assoc in receita.ingredientes_associados %}
-                        <li>
-                            <span>{{ assoc.ingrediente.nome|capitalize }}</span>
-                            <span>{{ assoc.quantidade }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
-    </div>
-{% endblock %}
-
 {% extends "layout.html" %}
 {% block title %}Início{% endblock %}
 {% block content %}
-    <div class="card p-4">
-        <h1 class="mb-3">Bem-vindo!</h1>
-        <p>Essa é a página inicial do sistema.</p>
-        <a href="{{ url_for('sobre') }}" class="btn btn-primary">Saiba mais</a>
-    </div>
+<h1 class="mb-4">Receitas Disponíveis</h1>
+
+<div class="row">
+    {% for receita in receitas %}
+        <div class="col-md-4 mb-4">
+            <div class="card p-3 h-100">
+                <h5 class="card-title">{{ receita.titulo }}</h5>
+                <p class="card-text text-muted">Chef: {{ receita.chef.nome }}</p>
+                <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}" class="btn btn-sm btn-outline-dark">
+                    Ver Chef
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <p>Nenhuma receita cadastrada ainda.</p>
+    {% endfor %}
+</div>
 {% endblock %}

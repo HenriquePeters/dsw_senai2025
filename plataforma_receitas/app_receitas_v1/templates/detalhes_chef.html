@@ -1,27 +1,20 @@
-{% extends 'base.html' %}
+{% extends "layout.html" %}
+{% block title %}Chef {{ chef.nome }}{% endblock %}
 {% block content %}
-    <h1>{{ chef.nome }}</h1>
+<div class="card p-4">
+    <h2>{{ chef.nome }}</h2>
     {% if chef.perfil %}
         <p><strong>Especialidade:</strong> {{ chef.perfil.especialidade }}</p>
-        <p><strong>Experiência:</strong> {{ chef.perfil.anos_experiencia }} anos</p>
+        <p><strong>Anos de Experiência:</strong> {{ chef.perfil.anos_experiencia }}</p>
     {% endif %}
-    <hr>
-    <h2>Receitas Criadas</h2>
-    <ul>
-    {% for receita in chef.receitas %}
-        <li>{{ receita.titulo }}</li>
-    {% else %}
-        <li>Nenhuma receita publicada.</li>
-    {% endfor %}
-    </ul>
-{% endblock %}
 
-{% extends "layout.html" %}
-{% block title %}Página Inicial{% endblock %}
-{% block content %}
-    <div class="card p-4">
-        <h1 class="mb-3">Bem-vindo!</h1>
-        <p>Este é um exemplo de página com layout profissional.</p>
-        <a href="#" class="btn btn-primary">Ação</a>
-    </div>
+    <h4 class="mt-4">Receitas desse chef</h4>
+    <ul>
+        {% for receita in chef.receitas %}
+            <li>{{ receita.titulo }}</li>
+        {% else %}
+            <li>Nenhuma receita cadastrada.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
