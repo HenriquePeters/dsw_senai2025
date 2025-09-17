@@ -19,3 +19,13 @@
         {% endfor %}
     </div>
 {% endblock %}
+
+{% extends "layout.html" %}
+{% block title %}Início{% endblock %}
+{% block content %}
+    <div class="card p-4">
+        <h1 class="mb-3">Bem-vindo!</h1>
+        <p>Essa é a página inicial do sistema.</p>
+        <a href="{{ url_for('sobre') }}" class="btn btn-primary">Saiba mais</a>
+    </div>
+{% endblock %}
