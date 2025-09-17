@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 # Define o caminho base do projeto
@@ -9,7 +9,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 # Configurações da aplicação
-# Define o caminho para o nosso banco de dados SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = \
     'sqlite:///' + os.path.join(basedir, 'instance', 'receitas.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,94 +21,82 @@ if not os.path.exists(instance_path):
 # Inicializa a extensão SQLAlchemy
 db = SQLAlchemy(app)
 
-# Importa os modelos DEPOIS de inicializar 'db'
-from flask import render_template, request, redirect, url_for
-from models import Chef, PerfilChef, Receita, Ingrediente, ReceitaIngrediente
+# ----------------- MODELOS -----------------
+class Chef(db.Model):
+    __tablename__ = "chefs"
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
 
-@app.route('/')
-def index():
-    receitas = Receita.query.all()
-    return render_template('index.html', receitas=receitas)
-
-@app.route('/receita/nova', methods=['GET', 'POST'])
-def criar_receita():
-    if request.method == 'POST':
-        # 1. Pega os dados básicos
-        titulo = request.form['titulo']
-        instrucoes = request.form['instrucoes']
-        chef_id = request.form['chef_id']
-
-        # 2. Cria o objeto Receita
-        nova_receita = Receita(titulo=titulo, instrucoes=instrucoes, chef_id=chef_id)
-        db.session.add(nova_receita)
-
-        # 3. Processa a string de ingredientes
-        ingredientes_str = request.form['ingredientes']
-        pares_ingredientes = [par.strip() for par in ingredientes_str.split(',') if par.strip()]
-        
-        for par in pares_ingredientes:
-            if ':' in par:
-                nome, qtd = par.split(':', 1)
-                nome_ingrediente = nome.strip().lower()
-                quantidade = qtd.strip()
-
-                # Encontra ou cria o ingrediente
-                ingrediente = Ingrediente.query.filter_by(nome=nome_ingrediente).first()
-                if not ingrediente:
-                    ingrediente = Ingrediente(nome=nome_ingrediente)
-                    db.session.add(ingrediente)
-                
-                # Cria a associação com a quantidade
-                associacao = ReceitaIngrediente(receita=nova_receita, ingrediente=ingrediente, quantidade=quantidade)
-                db.session.add(associacao)
-        
-        db.session.commit()
-        return redirect(url_for('index'))
-
-    # Se for GET, apenas mostra o formulário
-    chefs = Chef.query.all()
-    return render_template('criar_receita.html', chefs=chefs)
-
-@app.route('/chef/<int:chef_id>')
-def detalhes_chef(chef_id):
-    chef = Chef.query.get_or_404(chef_id)
-    return render_template('detalhes_chef.html', chef=chef)
-
-# Bloco para executar a aplicação
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    perfil = db.relationship("PerfilChef", back_populates="chef", uselist=False)
+    receitas = db.relationship("Receita", back_populates="chef")
 
 
-# --- Comandos CLI ---
+class PerfilChef(db.Model):
+    __tablename__ = "perfis_chefs"
+    id = db.Column(db.Integer, primary_key=True)
+    especialidade = db.Column(db.String(100))
+    anos_experiencia = db.Column(db.Integer)
 
+    chef_id = db.Column(db.Integer, db.ForeignKey("chefs.id"))
+    chef = db.relationship("Chef", back_populates="perfil")
+
+
+class Receita(db.Model):
+    __tablename__ = "receitas"
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(200), nullable=False)
+    instrucoes = db.Column(db.Text, nullable=False)
+
+    chef_id = db.Column(db.Integer, db.ForeignKey("chefs.id"), nullable=False)
+    chef = db.relationship("Chef", back_populates="receitas")
+
+    ingredientes = db.relationship("ReceitaIngrediente", back_populates="receita")
+
+
+class Ingrediente(db.Model):
+    __tablename__ = "ingredientes"
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), unique=True, nullable=False)
+
+    receitas = db.relationship("ReceitaIngrediente", back_populates="ingrediente")
+
+
+class ReceitaIngrediente(db.Model):
+    __tablename__ = "receitas_ingredientes"
+    id = db.Column(db.Integer, primary_key=True)
+    quantidade = db.Column(db.String(50))
+
+    receita_id = db.Column(db.Integer, db.ForeignKey("receitas.id"))
+    ingrediente_id = db.Column(db.Integer, db.ForeignKey("ingredientes.id"))
+
+    receita = db.relationship("Receita", back_populates="ingredientes")
+    ingrediente = db.relationship("Ingrediente", back_populates="receitas")
+
+# ----------------- CLI -----------------
 @app.cli.command('init-db')
 def init_db_command():
     """Cria as tabelas e popula com dados de exemplo."""
     db.drop_all()
     db.create_all()
 
-    # Criar Chefs e Perfis
     chef1 = Chef(nome='Ana Maria')
     perfil1 = PerfilChef(especialidade='Culinária Brasileira', anos_experiencia=25, chef=chef1)
     chef2 = Chef(nome='Érick Jacquin')
     perfil2 = PerfilChef(especialidade='Culinária Francesa', anos_experiencia=30, chef=chef2)
 
-    # Criar Ingredientes
     ingredientes = {
         'tomate': Ingrediente(nome='tomate'), 'cebola': Ingrediente(nome='cebola'),
         'farinha': Ingrediente(nome='farinha'), 'ovo': Ingrediente(nome='ovo'),
         'manteiga': Ingrediente(nome='manteiga')
     }
-    
+
     db.session.add_all([chef1, chef2] + list(ingredientes.values()))
 
-    # Criar Receitas
     receita1 = Receita(titulo='Molho de Tomate Clássico', instrucoes='...', chef=chef1)
     receita2 = Receita(titulo='Bolo Simples', instrucoes='...', chef=chef1)
     receita3 = Receita(titulo='Petit Gâteau', instrucoes='...', chef=chef2)
     db.session.add_all([receita1, receita2, receita3])
 
-    # Criar Associações com Quantidade
     db.session.add_all([
         ReceitaIngrediente(receita=receita1, ingrediente=ingredientes['tomate'], quantidade='5 unidades'),
         ReceitaIngrediente(receita=receita1, ingrediente=ingredientes['cebola'], quantidade='1 unidade'),
@@ -117,6 +104,60 @@ def init_db_command():
         ReceitaIngrediente(receita=receita2, ingrediente=ingredientes['ovo'], quantidade='3 unidades'),
         ReceitaIngrediente(receita=receita3, ingrediente=ingredientes['manteiga'], quantidade='150g')
     ])
-    
+
     db.session.commit()
     print('Banco de dados inicializado com sucesso!')
+
+# ----------------- ROTAS -----------------
+@app.route('/')
+def index():
+    receitas = Receita.query.all()
+    return render_template('index.html', receitas=receitas)
+
+
+@app.route('/receita/nova', methods=['GET', 'POST'])
+def criar_receita():
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        instrucoes = request.form['instrucoes']
+        chef_id = request.form['chef_id']
+
+        nova_receita = Receita(titulo=titulo, instrucoes=instrucoes, chef_id=chef_id)
+        db.session.add(nova_receita)
+
+        ingredientes_str = request.form['ingredientes']
+        pares_ingredientes = [par.strip() for par in ingredientes_str.split(',') if par.strip()]
+
+        for par in pares_ingredientes:
+            if ':' in par:
+                nome, qtd = par.split(':', 1)
+                nome_ingrediente = nome.strip().lower()
+                quantidade = qtd.strip()
+
+                ingrediente = Ingrediente.query.filter_by(nome=nome_ingrediente).first()
+                if not ingrediente:
+                    ingrediente = Ingrediente(nome=nome_ingrediente)
+                    db.session.add(ingrediente)
+
+                associacao = ReceitaIngrediente(
+                    receita=nova_receita,
+                    ingrediente=ingrediente,
+                    quantidade=quantidade
+                )
+                db.session.add(associacao)
+
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    chefs = Chef.query.all()
+    return render_template('criar_receita.html', chefs=chefs)
+
+
+@app.route('/chef/<int:chef_id>')
+def detalhes_chef(chef_id):
+    chef = Chef.query.get_or_404(chef_id)
+    return render_template('detalhes_chef.html', chef=chef)
+
+# ----------------- MAIN -----------------
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
