@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Editar Receita{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h2 class="mb-3">Editar Receita</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="titulo" class="form-label">Título</label>
+            <input type="text" class="form-control" id="titulo" name="titulo" value="{{ receita.titulo }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="instrucoes" class="form-label">Instruções</label>
+            <textarea class="form-control" id="instrucoes" name="instrucoes" rows="5" required>{{ receita.instrucoes }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Salvar Alterações</button>
+    </form>
+</div>
+{% endblock %}

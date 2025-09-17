@@ -12,9 +12,11 @@
                     <p class="card-text"><strong>Especialidade:</strong> {{ chef.perfil.especialidade }}</p>
                     <p class="card-text"><strong>Experiência:</strong> {{ chef.perfil.anos_experiencia }} anos</p>
                 {% endif %}
-                <a href="{{ url_for('detalhes_chef', chef_id=chef.id) }}" class="btn btn-sm btn-outline-dark">
-                    Ver Detalhes
-                </a>
+                <a href="{{ url_for('detalhes_chef', chef_id=chef.id) }}" class="btn btn-sm btn-outline-dark">Ver Detalhes</a>
+                <a href="{{ url_for('editar_chef', chef_id=chef.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="post" action="{{ url_for('excluir_chef', chef_id=chef.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                </form>
             </div>
         </div>
     {% else %}

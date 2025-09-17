@@ -9,9 +9,10 @@
             <div class="card p-3 h-100">
                 <h5 class="card-title">{{ receita.titulo }}</h5>
                 <p class="card-text text-muted">Chef: {{ receita.chef.nome }}</p>
-                <a href="{{ url_for('detalhes_chef', chef_id=receita.chef.id) }}" class="btn btn-sm btn-outline-dark">
-                    Ver Chef
-                </a>
+                <a href="{{ url_for('editar_receita', receita_id=receita.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="post" action="{{ url_for('excluir_receita', receita_id=receita.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                </form>
             </div>
         </div>
     {% else %}

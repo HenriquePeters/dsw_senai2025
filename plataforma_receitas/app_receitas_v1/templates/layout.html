@@ -52,18 +52,35 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('criar_receita') }}">Nova Receita</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('criar_chef') }}">Novo Chef</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('listar_chefs') }}">Chefs</a></li>
+    {% if 'usuario' in session %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('criar_receita') }}">Nova Receita</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('listar_chefs') }}">Chefs</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('criar_chef') }}">Novo Chef</a></li>
+        <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('logout') }}">Sair</a></li>
+    {% else %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Registrar</a></li>
+    {% endif %}
+</ul>
 
-                </ul>
             </div>
         </div>
     </nav>
 
     <!-- Conteúdo -->
     <main class="container my-4 flex-grow-1">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </main>
 
