@@ -6,17 +6,27 @@
 <div class="row">
     {% for chef in chefs %}
         <div class="col-md-4 mb-4">
-            <div class="card p-3 h-100">
+            <div class="card p-3 h-100 shadow-sm">
                 <h5 class="card-title">{{ chef.nome }}</h5>
                 {% if chef.perfil %}
-                    <p class="card-text"><strong>Especialidade:</strong> {{ chef.perfil.especialidade }}</p>
-                    <p class="card-text"><strong>Experiência:</strong> {{ chef.perfil.anos_experiencia }} anos</p>
+                    <p class="card-text text-muted">
+                        Especialidade: {{ chef.perfil.especialidade }}<br>
+                        Experiência: {{ chef.perfil.anos_experiencia }} anos
+                    </p>
                 {% endif %}
-                <a href="{{ url_for('detalhes_chef', chef_id=chef.id) }}" class="btn btn-sm btn-outline-dark">Ver Detalhes</a>
-                <a href="{{ url_for('editar_chef', chef_id=chef.id) }}" class="btn btn-sm btn-warning">Editar</a>
-                <form method="post" action="{{ url_for('excluir_chef', chef_id=chef.id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
-                </form>
+
+                <!-- Botões -->
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ url_for('detalhes_chef', chef_id=chef.id) }}" class="btn btn-info w-100">
+                        Detalhes
+                    </a>
+                    <a href="{{ url_for('editar_chef', chef_id=chef.id) }}" class="btn btn-warning w-100">
+                        Editar
+                    </a>
+                    <form method="post" action="{{ url_for('excluir_chef', chef_id=chef.id) }}">
+                        <button type="submit" class="btn btn-danger w-100">Excluir</button>
+                    </form>
+                </div>
             </div>
         </div>
     {% else %}

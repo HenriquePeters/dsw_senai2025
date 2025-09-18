@@ -1,22 +1,29 @@
 {% extends "layout.html" %}
 {% block title %}Novo Chef{% endblock %}
 {% block content %}
-<div class="card p-4 col-md-6 mx-auto">
-    <h2 class="mb-3">Cadastrar Novo Chef</h2>
-    <form method="post">
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow p-4">
+      <h3 class="text-center mb-4">Cadastrar Chef</h3>
+      <form method="post">
         <div class="mb-3">
-            <label for="nome" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" required>
+          <label for="nome" class="form-label">Nome</label>
+          <input type="text" class="form-control" id="nome" name="nome" required>
         </div>
         <div class="mb-3">
-            <label for="especialidade" class="form-label">Especialidade</label>
-            <input type="text" class="form-control" id="especialidade" name="especialidade" required>
+          <label for="especialidade" class="form-label">Especialidade</label>
+          <input type="text" class="form-control" id="especialidade" name="especialidade">
         </div>
         <div class="mb-3">
-            <label for="anos_experiencia" class="form-label">Anos de Experiência</label>
-            <input type="number" class="form-control" id="anos_experiencia" name="anos_experiencia" min="0" required>
+          <label for="anos_experiencia" class="form-label">Anos de Experiência</label>
+          <input type="number" class="form-control" id="anos_experiencia" name="anos_experiencia">
         </div>
-        <button type="submit" class="btn btn-success">Salvar Chef</button>
-    </form>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-success w-100">Salvar</button>
+          <a href="{{ url_for('listar_chefs') }}" class="btn btn-secondary w-100">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

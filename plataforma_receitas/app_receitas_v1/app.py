@@ -94,7 +94,7 @@ def init_db_command():
 
     # Usuário admin
     admin = Usuario(usuario="admin")
-    admin.set_password("123")
+    admin.set_password("admin")
     db.session.add(admin)
 
     # Criando Chefs
@@ -178,6 +178,23 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
+
+@app.route('/perfil', methods=['GET', 'POST'])
+def perfil():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    usuario = Usuario.query.filter_by(usuario=session['usuario']).first()
+
+    if request.method == 'POST':
+        nova_senha = request.form['senha']
+        if nova_senha:
+            usuario.set_password(nova_senha)
+            db.session.commit()
+            flash("Senha alterada com sucesso!", "success")
+        return redirect(url_for('perfil'))
+
+    return render_template('perfil.html', usuario=usuario)
 
 # ----------------- PROTEÇÃO -----------------
 def login_required(func):

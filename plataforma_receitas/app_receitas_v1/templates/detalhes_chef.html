@@ -1,20 +1,24 @@
 {% extends "layout.html" %}
-{% block title %}Chef {{ chef.nome }}{% endblock %}
+{% block title %}Detalhes do Chef{% endblock %}
 {% block content %}
-<div class="card p-4">
-    <h2>{{ chef.nome }}</h2>
+<div class="card p-4 shadow-sm">
+    <h3>{{ chef.nome }}</h3>
     {% if chef.perfil %}
         <p><strong>Especialidade:</strong> {{ chef.perfil.especialidade }}</p>
         <p><strong>Anos de Experiência:</strong> {{ chef.perfil.anos_experiencia }}</p>
     {% endif %}
 
-    <h4 class="mt-4">Receitas desse chef</h4>
+    <h5 class="mt-3">Receitas:</h5>
     <ul>
         {% for receita in chef.receitas %}
             <li>{{ receita.titulo }}</li>
         {% else %}
-            <li>Nenhuma receita cadastrada.</li>
+            <li>Este chef ainda não possui receitas.</li>
         {% endfor %}
     </ul>
+
+    <div class="d-grid gap-2 mt-3">
+        <a href="{{ url_for('listar_chefs') }}" class="btn btn-secondary w-100">Voltar</a>
+    </div>
 </div>
 {% endblock %}

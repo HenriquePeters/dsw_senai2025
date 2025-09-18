@@ -1,22 +1,29 @@
 {% extends "layout.html" %}
 {% block title %}Editar Chef{% endblock %}
 {% block content %}
-<div class="card p-4 col-md-6 mx-auto">
-    <h2 class="mb-3">Editar Chef</h2>
-    <form method="post">
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow p-4">
+      <h3 class="text-center mb-4">Editar Chef</h3>
+      <form method="post">
         <div class="mb-3">
-            <label for="nome" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" value="{{ chef.nome }}" required>
+          <label for="nome" class="form-label">Nome</label>
+          <input type="text" class="form-control" id="nome" name="nome" value="{{ chef.nome }}" required>
         </div>
         <div class="mb-3">
-            <label for="especialidade" class="form-label">Especialidade</label>
-            <input type="text" class="form-control" id="especialidade" name="especialidade" value="{{ chef.perfil.especialidade }}" required>
+          <label for="especialidade" class="form-label">Especialidade</label>
+          <input type="text" class="form-control" id="especialidade" name="especialidade" value="{{ chef.perfil.especialidade }}">
         </div>
         <div class="mb-3">
-            <label for="anos_experiencia" class="form-label">Anos de Experiência</label>
-            <input type="number" class="form-control" id="anos_experiencia" name="anos_experiencia" value="{{ chef.perfil.anos_experiencia }}" min="0" required>
+          <label for="anos_experiencia" class="form-label">Anos de Experiência</label>
+          <input type="number" class="form-control" id="anos_experiencia" name="anos_experiencia" value="{{ chef.perfil.anos_experiencia }}">
         </div>
-        <button type="submit" class="btn btn-success">Salvar Alterações</button>
-    </form>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-warning w-100">Atualizar</button>
+          <a href="{{ url_for('listar_chefs') }}" class="btn btn-secondary w-100">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
