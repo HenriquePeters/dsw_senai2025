@@ -133,7 +133,7 @@ def init_db_command():
     ])
 
     db.session.commit()
-    print("✅ Banco de dados inicializado com sucesso! Usuário admin criado (admin/123)")
+    print("✅ Banco de dados inicializado com sucesso! Usuário admin criado (admin/admins)")
 
 # ----------------- LOGIN/LOGOUT -----------------
 @app.route('/login', methods=['GET', 'POST'])
